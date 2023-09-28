@@ -52,8 +52,6 @@ namespace Vertical.Slice.Playground.Features.Forecasts.V1
                 .HasApiVersion(versionOne)
                 .Build();
 
-            // config ends here
-
             app.MapGet("v{version:apiVersion}/weatherforecast",
                     async (ISender sender) =>
                     {
