@@ -1,4 +1,5 @@
 using Carter;
+using Vertical.Slice.WebApi.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IWeatherForecastRepository, WeatherForecastRepository>();
 
 var app = builder.Build();
 

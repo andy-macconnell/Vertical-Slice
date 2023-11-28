@@ -1,38 +1,23 @@
 ﻿using Carter;
 using MediatR;
+using Vertical.Slice.WebApi.Database;
+using Vertical.Slice.WebApi.Entities;
 
 namespace Vertical.Slice.WebApi.Features.WeatherForecasts.GetForecasts
 {
-    public record GetForecastRequest() : IRequest<GetForecastResponse>;
+    public record GetForecastQuery() : IRequest<GetForecastResponse>;
 
-    public class GetForecastRequestHandler : IRequestHandler<GetForecastRequest, GetForecastResponse>
+    public class GetForecastQueryHandler : IRequestHandler<GetForecastQuery, GetForecastResponse>
     {
-        private readonly string[] summaries =
-        [
-            "Freezing",
-            "Bracing",
-            "Chilly",
-            "Cool",
-            "Mild",
-            "Warm",
-            "Balmy",
-            "Hot",
-            "Sweltering",
-            "Scorching"
-        ];
+        private readonly IWeatherForecastRepository _repository;
 
-        public Task<GetForecastResponse> Handle(GetForecastRequest request, CancellationToken cancellationToken)
+        public GetForecastQueryHandler(IWeatherForecastRepository repository) 
+            => _repository = repository;
+
+        public async Task<GetForecastResponse> Handle(GetForecastQuery request, CancellationToken cancellationToken)
         {
-            var forecast = Enumerable.Range(1, 5).Select(index =>
-                    new WeatherForecast
-                    (
-                        DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                        Random.Shared.Next(-20, 55),
-                        summaries[Random.Shared.Next(summaries.Length)]
-                    ))
-                    .ToArray();
-
-            return Task.FromResult(new GetForecastResponse(forecast));
+            var result = await _repository.GetForecasts();
+            return new GetForecastResponse(result);
         }
     }
 
@@ -42,15 +27,9 @@ namespace Vertical.Slice.WebApi.Features.WeatherForecasts.GetForecasts
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/weatherforecast", async (ISender sender) => { return await sender.Send(new GetForecastRequest()); })
+            app.MapGet("/forecasts", async (ISender sender) => { return await sender.Send(new GetForecastQuery()); })
                .WithName("GetWeatherForecast")
                .WithOpenApi();
         }
     }
-
-    public record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-    {
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-    }
-
 }
