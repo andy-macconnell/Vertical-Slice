@@ -1,7 +1,7 @@
 ﻿using Carter;
 using MediatR;
 
-namespace Vertical.Slice.WebApi.Features.WeatherForecasts
+namespace Vertical.Slice.WebApi.Features.WeatherForecasts.GetForecasts
 {
     public record GetForecastRequest() : IRequest<GetForecastResponse>;
 
@@ -31,7 +31,7 @@ namespace Vertical.Slice.WebApi.Features.WeatherForecasts
                         summaries[Random.Shared.Next(summaries.Length)]
                     ))
                     .ToArray();
-            
+
             return Task.FromResult(new GetForecastResponse(forecast));
         }
     }
